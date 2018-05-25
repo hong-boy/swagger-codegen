@@ -1,0 +1,71 @@
+<?php
+
+namespace {{invokerPackage}};
+
+/**
+* SignatureUtil
+*/
+class SignatureUtil
+{
+
+    /**
+     * 日志打印
+     * @param $key
+     * @param $msg
+     */
+    public static function logmsg($key, $msg)
+    {
+        echo $key, $msg, '\r\n';
+    }
+
+    /**
+     * 获取当前时间毫秒值
+     * @return float 时间毫秒值
+     */
+    public static function getMillisecond() {
+        list($microsecond , $time) = explode(' ', microtime()); //' '中间是一个空格
+        return (float)sprintf('%.0f',(floatval($microsecond)+floatval($time))*1000);
+    }
+
+    /**
+     * 生成authCode
+     * @param $request_method
+     * @param $ak
+     * @param $access_id
+     * @param $params
+     * @return string
+     */
+    public static function genAuthCode($request_method, $ak, $access_id, $params)
+    {
+        // 获得auth perfix string
+        $arr = [];
+        array_push($arr, 'accessId=' . $access_id);
+        array_push($arr, 'nonce=' . md5(self::getMillisecond()));
+        array_push($arr, 'timestamp=' . self::getMillisecond());
+        $auth_perfix_string = implode('&', $arr);
+        self::logmsg('authPrefixString: ', $auth_perfix_string);
+
+        //获得signature
+        $sign_key = base64_encode(hash_hmac('sha1', $auth_perfix_string, $ak, true));
+        self::logmsg('signingKey: ', $sign_key);
+
+        //获取signatureContent
+        $arr = [];
+        ksort($params);
+        foreach ($params as $p => $v){
+            $params_key = $p;
+            $value = $v;
+            $value = is_array($value)||is_object($value) ? json_encode($value) : $value;
+            if($value || is_numeric($value)){
+                array_push($arr, $params_key . '=' . urlencode($value));
+            }
+        }
+
+        $signature_content = strtoupper($request_method) . '-' . implode('&', $arr);
+        self::logmsg('signatureContent: ', $signature_content);
+
+        // 获得signature
+        $signature = base64_encode(hash_hmac('sha1', $signature_content, $sign_key, true));
+        return $auth_perfix_string . '&signature=' . urlencode($signature);
+    }
+}

@@ -102,12 +102,65 @@ class Configuration
     protected $tempFolderPath;
 
     /**
+     * 由BaaS平台生成，用于标示accessId对应的唯一的accessKey
+     * @var string
+     */
+    protected $accessId = null;
+
+    /**
+     * 由BaaS平台和accessId一起生成，签名的密钥，严格保密只有平台方和用户知道
+     * @var string
+     */
+    protected $accessKey = null;
+
+    /**
      * Constructor
      */
-    public function __construct()
+    public function __construct($accessId=null, $accessKey=null, $host=null)
     {
+        if($accessId===null || $accessKey===null){
+            throw new \Exception("Both accessId and accessKey are required: $accessId, $accessKey");
+        }
+
+        $this->accessId = $accessId;
+        $this->accessKey = $accessKey;
+
+        if($host !== null){
+            $this->setHost($host);
+        }
+
         $this->tempFolderPath = sys_get_temp_dir();
     }
+
+    /**
+         * Sets accessId
+         * @param $accessId 由BaaS平台生成，用于标示accessId对应的唯一的accessKey
+         */
+        public function setAccessId($accessId) {
+            $this->accessId = $accessId;
+        }
+
+        /**
+         * Gets accessId
+         */
+        public function getAccessId() {
+            return $this->accessId;
+        }
+
+        /**
+         * Sets accessKey
+         * @param $accessKey 由BaaS平台生成，用于标示accessId对应的唯一的accessKey
+         */
+        public function setAccessKey($accessKey) {
+            $this->accessKey = $accessKey;
+        }
+
+        /**
+         * Gets accessKey
+         */
+        public function getAccessKey() {
+            return $this->accessKey;
+        }
 
     /**
      * Sets API key

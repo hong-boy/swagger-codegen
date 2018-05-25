@@ -28,6 +28,7 @@ use {{invokerPackage}}\ApiException;
 use {{invokerPackage}}\Configuration;
 use {{invokerPackage}}\HeaderSelector;
 use {{invokerPackage}}\ObjectSerializer;
+use {{invokerPackage}}\SignatureUtil;
 
 /**
  * {{classname}} Class Doc Comment
@@ -55,17 +56,15 @@ use {{invokerPackage}}\ObjectSerializer;
     protected $headerSelector;
 
     /**
-     * @param ClientInterface $client
      * @param Configuration   $config
      * @param HeaderSelector  $selector
      */
     public function __construct(
-        ClientInterface $client = null,
         Configuration $config = null,
         HeaderSelector $selector = null
     ) {
-        $this->client = $client ?: new Client();
-        $this->config = $config ?: new Configuration();
+        $this->client = new Client();
+        $this->config = $config;
         $this->headerSelector = $selector ?: new HeaderSelector();
     }
 
@@ -99,7 +98,7 @@ use {{invokerPackage}}\ObjectSerializer;
      */
     public function {{operationId}}({{#allParams}}${{paramName}}{{^required}} = {{#defaultValue}}'{{{.}}}'{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}}{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
     {
-        {{#returnType}}list($response) = {{/returnType}}$this->{{operationId}}WithHttpInfo({{#allParams}}${{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});{{#returnType}}
+        {{#returnType}}$response = {{/returnType}}$this->{{operationId}}WithHttpInfo({{#allParams}}${{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});{{#returnType}}
         return $response;{{/returnType}}
     }
 
@@ -348,6 +347,7 @@ use {{invokerPackage}}\ObjectSerializer;
         $resourcePath = '{{{path}}}';
         $formParams = [];
         $queryParams = [];
+        $pathParams = [];
         $headerParams = [];
         $httpBody = '';
         $multipart = false;
@@ -388,7 +388,9 @@ use {{invokerPackage}}\ObjectSerializer;
                 ObjectSerializer::toPathValue(${{paramName}}),
                 $resourcePath
             );
+            $pathParams['{{paramName}}'] = ${{paramName}};
         }
+
         {{/pathParams}}
 
         {{#formParams}}
@@ -477,6 +479,14 @@ use {{invokerPackage}}\ObjectSerializer;
         if ($this->config->getUserAgent()) {
             $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
         }
+
+        // populate header with authCode
+        $headerParams['authCode'] = SignatureUtil::genAuthCode(
+            '{{httpMethod}}',
+            $this->config->getAccessKey(),
+            $this->config->getAccessId(),
+            array_merge($queryParams, $pathParams)
+        );
 
         $headers = array_merge(
             $defaultHeaders,

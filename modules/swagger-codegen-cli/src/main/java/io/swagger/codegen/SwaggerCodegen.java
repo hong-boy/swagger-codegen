@@ -20,6 +20,8 @@ public class SwaggerCodegen {
 
 
     public static void main(String[] args) {
+        //config-help -l php
+        //generate -l php -i http://demo.heclouds.com/baasapi/v2/api-docs?group=baas%20demo -o D:\workspace\php_workspace\baas-rest-sdk-php2 -c D:\workspace\java_workspace\swagger-codegen\baas-sdk-php-config.json
         String version = Version.readVersionFromResources();
         @SuppressWarnings("unchecked")
         Cli.CliBuilder<Runnable> builder =

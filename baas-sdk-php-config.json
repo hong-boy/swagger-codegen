@@ -1,0 +1,15 @@
+{
+
+  "sortParamsByRequiredFlag": true,
+  "ensureUniqueParams": true,
+  "allowUnicodeIdentifiers": false,
+  "modelPackage": "model",
+  "apiPackage": "api",
+  "invokerPackage": "cmiot\\baas",
+  "packagePath": "APIClient",
+  "srcBasePath": "src",
+  "composerVendorName": "composer",
+  "gitUserId": "cmiot-baas-php",
+  "gitRepoId": "baas-rest-sdk-php",
+  "artifactVersion": "0.0.1"
+}
