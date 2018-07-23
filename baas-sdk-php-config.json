@@ -11,5 +11,5 @@
   "composerVendorName": "composer",
   "gitUserId": "cmiot-baas-php",
   "gitRepoId": "baas-rest-sdk-php",
-  "artifactVersion": "0.0.1"
+  "artifactVersion": "2.0.0"
 }
